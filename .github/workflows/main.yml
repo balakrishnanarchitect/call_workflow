@@ -1,0 +1,51 @@
+# File: .github/workflows/main.yml
+# Repository: repo1 (caller repository)
+
+name: Test Environment Protection
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+        - dev
+        - staging
+        - prod
+      message:
+        description: 'Deployment message'
+        required: true
+        default: 'Test deployment'
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ github.event.inputs.environment }}
+      message: ${{ github.event.inputs.message }}
+      timestamp: ${{ steps.time.outputs.timestamp }}
+    steps:
+      - name: Get timestamp
+        id: time
+        run: echo "timestamp=$(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_OUTPUT
+      
+      - name: Setup Summary
+        run: |
+          echo "## Deployment Setup" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: ${{ github.event.inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Message**: ${{ github.event.inputs.message }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Timestamp**: $(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_STEP_SUMMARY
+
+  call-reusable-workflow:
+    needs: setup
+    uses: your-org/repo2/.github/workflows/reusable-deploy.yml@main
+    with:
+      environment: ${{ needs.setup.outputs.environment }}
+      message: ${{ needs.setup.outputs.message }}
+      timestamp: ${{ needs.setup.outputs.timestamp }}
+    secrets:
+      DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+      NOTIFICATION_WEBHOOK: ${{ secrets.NOTIFICATION_WEBHOOK }}
