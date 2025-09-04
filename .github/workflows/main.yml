@@ -41,7 +41,7 @@ jobs:
 
   call-reusable-workflow:
     needs: setup
-    uses: balakrishnanarchitect/reusable-workflow/.github/workflows/reusable-deploy.yml@main
+    uses: /balakrishnanarchitect/reusable-workflow/.github/workflows/reusable-deploy.yml@main
     with:
       environment: ${{ needs.setup.outputs.environment }}
       message: ${{ needs.setup.outputs.message }}
