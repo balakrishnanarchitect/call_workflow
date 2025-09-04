@@ -6,7 +6,7 @@ name: Test Environment Protection
 on:
   workflow_dispatch:
     inputs:
-      environment:
+      bala:
         description: 'Environment to deploy to'
         required: true
         default: 'dev'
